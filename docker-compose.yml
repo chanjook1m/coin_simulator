@@ -5,10 +5,10 @@ services:
     container_name: coin-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD
       MYSQL_DATABASE: coin_db
-      MYSQL_USER: coin_user
-      MYSQL_PASSWORD: coin_pass
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3307:3307"
     volumes:
