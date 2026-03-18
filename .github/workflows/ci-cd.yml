@@ -48,7 +48,7 @@ jobs:
   # 2단계: 도커 빌드 및 EC2 배포
   deploy:
     needs: check
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
