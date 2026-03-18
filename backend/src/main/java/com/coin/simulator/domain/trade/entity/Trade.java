@@ -19,10 +19,8 @@ public class Trade {
     @ManyToOne(fetch=FetchType.LAZY)
     private Coin coin;
 
-    private String type;
     private BigDecimal price;
     private BigDecimal quantity;
-    private BigDecimal totalAmount;
     private LocalDateTime createdAt;
 
 }
