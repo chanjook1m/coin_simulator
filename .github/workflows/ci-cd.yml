@@ -6,7 +6,7 @@ on:
     # [핵심] backend 폴더 내의 파일이 수정될 때만 이 워크플로우를 실행합니다.
     paths:
       - 'backend/**'
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   # 1단계: 테스트 및 코드 품질 검사
