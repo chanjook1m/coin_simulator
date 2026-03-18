@@ -20,5 +20,22 @@ services:
     ports:
       - "6379:6379"
 
+  app:
+    image: ${DOCKER_USERNAME}/coin-simulator:latest
+    container_name: coin-app
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/coin_db
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_PROFILES_ACTIVE=prod
+
 volumes:
   mysql-data:

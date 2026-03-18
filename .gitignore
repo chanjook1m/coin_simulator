@@ -39,3 +39,4 @@ out/
 
 ### ENVIRONMENT ###
 .env
+*.env
