@@ -1,6 +1,5 @@
-LABEL authors="ChrisKim"
-FROM openjdk:17-jdk-slim
+FROM amazoncorretto:17-alpine-jdk
 WORKDIR /app
-COPY target/*.jar app.jar
+COPY build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]
