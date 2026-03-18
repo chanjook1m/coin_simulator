@@ -6,6 +6,9 @@ WORKDIR /app
 # 소스 코드를 복사합니다.
 COPY . .
 
+# gradlew에 실행 권한 부여
+RUN chmod +x gradlew
+
 # Gradle 빌드를 실행하여 JAR 파일을 생성합니다.
 # --no-daemon 옵션은 CI 환경에서 메모리 효율을 위해 사용합니다.
 RUN ./gradlew bootJar --no-daemon
