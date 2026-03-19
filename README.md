@@ -259,5 +259,131 @@ sequenceDiagram
     C-->>U: 200 OK
 ```
 
+## 8) 실시간 시세 수집
+```mermaid
+sequenceDiagram
+    title 실시간 시세 수집 
+    autonumber
+    participant Sch as PriceScheduler
+    participant Client as UpbitApiClient
+    participant PS as PriceService
+    participant PRepo as PriceRepository
+    participant Redis as RedisTemplate
+
+    Sch->>Client: 최신 시세 데이터 요청 (Ticker API)
+    Client-->>Sch: 코인별 현재가 데이터 반환
+    
+    loop 각 코인별 데이터 처리
+        Sch->>PS: updateCurrentPrice(priceData)
+        activate PS
+        PS->>PRepo: save(PriceEntity) (DB 적재)
+        PS->>Redis: opsForValue().set(symbol, price) (캐싱)
+        deactivate PS
+    end
+    
+    Note over Sch, Redis: 주기적으로(예: 10초 단위) 반복 수행
+```
+
+## 9) 주문 체결 처리
+```mermaid
+sequenceDiagram
+    title 주문 체결 처리 
+    autonumber
+    participant Engine as MatchingEngine
+    participant ORepo as OrderRepository
+    participant TS as TradeService
+    participant TRepo as TradeRepository
+    participant HS as HoldingService
+    participant HRepo as HoldingRepository
+
+    Engine->>ORepo: findByStatus("PENDING") 
+    Note right of Engine: 현재 시세와 주문 조건 비교
+    
+    alt 체결 조건 만족
+        Engine->>TS: executeTrade(orderId, price, quantity)
+        activate TS
+        TS->>TRepo: save(TradeEntity)
+        TS->>ORepo: updateOrderStatus(COMPLETED)
+        
+        TS->>HS: updateAsset(walletId, coinId, price, quantity)
+        activate HS
+        HS->>HRepo: findByWalletAndCoin()
+        Note over HS, HRepo: 수량 추가 및 평단가(avgPrice) 계산
+        HS->>HRepo: save(HoldingEntity)
+        deactivate HS
+        deactivate TS
+    end
+    
+    Note over Engine, HRepo: @Transactional을 통한 비즈니스 원자성 보장
+```
+
+## 10) 초기 자금 지급
+```mermaid
+sequenceDiagram
+    title 초기 자금 지급
+    autonumber
+    actor User as 신규 유저
+    participant Ctrl as AuthController
+    participant WS as WalletService
+    participant WRepo as WalletRepository
+    participant LS as LedgerService
+    participant LRepo as LedgerRepository
+
+    User->>Ctrl: 회원가입 요청
+    Ctrl->>WS: createInitialWallet(userId)
+    
+    activate WS
+    WS->>WRepo: save(New Wallet {balance: 1,000,000})
+    
+    WS->>LS: recordInitialBonus(userId, amount)
+    activate LS
+    LS->>LRepo: save(Ledger {reason: "WELCOME_BONUS"})
+    deactivate LS
+    
+    WS-->>Ctrl: 지갑 및 자산 생성 완료
+    deactivate WS
+    
+    Ctrl-->>User: 가입 완료 응답
+```
+
+## 11) 미체결 주문 취소
+```mermaid
+sequenceDiagram
+    title 미체결 주문 단건 취소 
+    autonumber
+    actor User as 사용자
+    participant Ctrl as OrderController
+    participant OS as OrderService
+    participant ORepo as OrderRepository
+    participant WS as WalletService
+    participant WRepo as WalletRepository
+    participant LS as LedgerService
+    participant LRepo as LedgerRepository
+
+    User->>Ctrl: DELETE /api/v1/orders/{orderId} (취소 요청)
+    Ctrl->>OS: cancelOrder(orderId, userId)
+    
+    activate OS
+    OS->>ORepo: findById(orderId) 
+    Note right of OS: 주문 상태가 'PENDING'인지 검증
+    
+    OS->>ORepo: updateStatus(CANCELED)
+    
+    OS->>WS: refundToWallet(userId, amount)
+    activate WS
+    WS->>WRepo: updateBalance(userId, +amount) (잔액 복구)
+    
+    WS->>LS: recordRefund(userId, amount, "USER_CANCELED")
+    activate LS
+    LS->>LRepo: save(Ledger {reason: "ORDER_CANCEL_REFUND"})
+    deactivate LS
+    
+    deactivate WS
+    OS-->>Ctrl: 취소 완료 결과 반환
+    deactivate OS
+    
+    Ctrl-->>User: 200 OK (주문 취소 및 환불 성공)
+```
+
 # 3. ERD
 <img width="1620" height="912" alt="Image" src="https://github.com/user-attachments/assets/0a606897-6a2a-4dd2-8750-a80c6eea9b98" />
