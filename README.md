@@ -57,6 +57,46 @@ flowchart LR
 
 # 2. 시퀀스 다이어그램
 
+## 0) 코인 매도
+```mermaid
+sequenceDiagram
+    autonumber
+    title: [00] 코인 매도
+    
+    participant U as 사용자 (Frontend)
+    participant C as OrderController
+    participant S as OrderService
+    participant HS as HoldingService
+    participant WS as WalletService
+    participant O as OrderRepository
+
+    U->>C: POST /api/v1/orders (매도 요청)
+    C->>S: placeOrder(sellOrderRequestDTO)
+    
+    S->>HS: 해당 코인 보유 수량 조회 요청
+    HS-->>S: 판매 가능 수량 충분함 확인
+    
+    rect rgb(240, 240, 240)
+        Note over S, O: [Transaction Start]
+        S->>O: 주문 생성 (Type: SELL, Status: PENDING)
+        
+        Note over S: 체결 로직 수행 (현재 시세 기준 가치 계산)
+        
+        S->>O: 주문 상태 업데이트 (Status: FILLED)
+        
+        S->>HS: 코인 보유 수량 차감 (Holding 감소)
+        HS-->>S: 차감 완료
+        
+        S->>WS: 매도 금액만큼 잔액 가산 (Cash 증가)
+        WS-->>S: 가산 완료
+        
+        Note over S, O: [Transaction Commit]
+    end
+    
+    S-->>C: 주문 처리 결과(OrderResponseDTO) 반환
+    C-->>U: 201 Created (매도 성공 및 정산 완료)
+```
+
 ## 1) 코인 매수
 ```mermaid
 sequenceDiagram
@@ -284,40 +324,8 @@ sequenceDiagram
     Note over Sch, Redis: 주기적으로(예: 10초 단위) 반복 수행
 ```
 
-## 9) 주문 체결 처리
-```mermaid
-sequenceDiagram
-    title 주문 체결 처리 
-    autonumber
-    participant Engine as MatchingEngine
-    participant ORepo as OrderRepository
-    participant TS as TradeService
-    participant TRepo as TradeRepository
-    participant HS as HoldingService
-    participant HRepo as HoldingRepository
 
-    Engine->>ORepo: findByStatus("PENDING") 
-    Note right of Engine: 현재 시세와 주문 조건 비교
-    
-    alt 체결 조건 만족
-        Engine->>TS: executeTrade(orderId, price, quantity)
-        activate TS
-        TS->>TRepo: save(TradeEntity)
-        TS->>ORepo: updateOrderStatus(COMPLETED)
-        
-        TS->>HS: updateAsset(walletId, coinId, price, quantity)
-        activate HS
-        HS->>HRepo: findByWalletAndCoin()
-        Note over HS, HRepo: 수량 추가 및 평단가(avgPrice) 계산
-        HS->>HRepo: save(HoldingEntity)
-        deactivate HS
-        deactivate TS
-    end
-    
-    Note over Engine, HRepo: @Transactional을 통한 비즈니스 원자성 보장
-```
-
-## 10) 초기 자금 지급
+## 09) 초기 자금 지급
 ```mermaid
 sequenceDiagram
     title 초기 자금 지급
@@ -344,45 +352,6 @@ sequenceDiagram
     deactivate WS
     
     Ctrl-->>User: 가입 완료 응답
-```
-
-## 11) 미체결 주문 취소
-```mermaid
-sequenceDiagram
-    title 미체결 주문 단건 취소 
-    autonumber
-    actor User as 사용자
-    participant Ctrl as OrderController
-    participant OS as OrderService
-    participant ORepo as OrderRepository
-    participant WS as WalletService
-    participant WRepo as WalletRepository
-    participant LS as LedgerService
-    participant LRepo as LedgerRepository
-
-    User->>Ctrl: DELETE /api/v1/orders/{orderId} (취소 요청)
-    Ctrl->>OS: cancelOrder(orderId, userId)
-    
-    activate OS
-    OS->>ORepo: findById(orderId) 
-    Note right of OS: 주문 상태가 'PENDING'인지 검증
-    
-    OS->>ORepo: updateStatus(CANCELED)
-    
-    OS->>WS: refundToWallet(userId, amount)
-    activate WS
-    WS->>WRepo: updateBalance(userId, +amount) (잔액 복구)
-    
-    WS->>LS: recordRefund(userId, amount, "USER_CANCELED")
-    activate LS
-    LS->>LRepo: save(Ledger {reason: "ORDER_CANCEL_REFUND"})
-    deactivate LS
-    
-    deactivate WS
-    OS-->>Ctrl: 취소 완료 결과 반환
-    deactivate OS
-    
-    Ctrl-->>User: 200 OK (주문 취소 및 환불 성공)
 ```
 
 # 3. ERD
