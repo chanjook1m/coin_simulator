@@ -11,34 +11,46 @@ flowchart LR
         Vite@{ label: "<img src=\"https://cdn.simpleicons.org/vite\" width=\"30\"><br>Vite" }
         React@{ label: "<img src=\"https://cdn.simpleicons.org/react\" width=\"30\"><br>React" }
   end
- subgraph CI_CD["CI/CD & Monitoring"]
-        GitHub@{ label: "<img src=\"https://cdn.simpleicons.org/github\" width=\"30\"><br>GitHub" }
-        SonarQube["SonarQube"]
+
+ subgraph CI_CD["CI/CD & Code Quality"]
+        GitHub@{ label: "<img src=\"https://cdn.simpleicons.org/github\" width=\"30\"><br>GitHub Actions" }
+        Codacy@{ label: "<img src=\"https://cdn.simpleicons.org/codacy\" width=\"30\"><br>Codacy" }
+        Codecov@{ label: "<img src=\"https://cdn.simpleicons.org/codecov\" width=\"30\"><br>Codecov" }
   end
+
  subgraph App_Logic["Application"]
         Spring@{ label: "<img src=\"https://cdn.simpleicons.org/springboot\" width=\"40\"><br>Spring Boot" }
         Security@{ label: "<img src=\"https://cdn.simpleicons.org/springsecurity\" width=\"30\"><br>Security" }
   end
+
  subgraph Data_Storage["Data Storage"]
         MySQL@{ label: "<img src=\"https://cdn.simpleicons.org/mysql\" width=\"40\"><br>MySQL" }
         Redis@{ label: "<img src=\"https://cdn.simpleicons.org/redis\" width=\"40\"><br>Redis" }
   end
+
  subgraph Backend_Server["Backend (Amazon EC2)"]
     direction TB
         App_Logic
         Data_Storage
   end
+
  subgraph External["External Services"]
         Upbit["Upbit API"]
   end
+
     User(("User")) <--> Browser["Browser / Client"]
     Vite --- React
     Browser <-- Axios / REST API --> Spring
-    GitHub -- Deploy --> Frontend_Space
-    GitHub -- Workflow --> Spring
-    Spring --> SonarQube
+    
+    %% CI/CD 흐름
+    GitHub -- "Deploy" --> Frontend_Space
+    GitHub -- "Workflow & Push" --> Spring
+    Spring -- "Test Reports" --> Codecov
+    Spring -- "Static Analysis" --> Codacy
+    
     Spring <--> MySQL & Redis & Upbit
 
+    %% 스타일 및 쉐이프 설정
     Vite@{ shape: rect}
     React@{ shape: rect}
     GitHub@{ shape: rect}
@@ -46,7 +58,11 @@ flowchart LR
     Security@{ shape: rect}
     MySQL@{ shape: cylinder}
     Redis@{ shape: rect}
-    style SonarQube fill:#fff,stroke:#4E9BCD,stroke-width:2px
+    Codacy@{ shape: rect}
+    Codecov@{ shape: rect}
+
+    style Codacy fill:#fff,stroke:#222,stroke-width:2px
+    style Codecov fill:#fff,stroke:#F01F7A,stroke-width:2px
     style Spring fill:#fff,stroke:#6DB33F,stroke-width:2px
     style MySQL fill:#fff,stroke:#4479A1,stroke-width:2px
     style Redis fill:#fff,stroke:#DC382D,stroke-width:2px
