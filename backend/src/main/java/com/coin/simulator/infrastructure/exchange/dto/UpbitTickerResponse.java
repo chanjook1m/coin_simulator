@@ -5,8 +5,8 @@ import lombok.Builder;
 import java.math.BigDecimal;
 
 @Builder
-public record ExchangeTickerResponse(
+public record UpbitTickerResponse (
         String market,
-        BigDecimal price,
-        long timestampMillis
-) {}
+        BigDecimal tradePrice,
+        long timestamp
+){ }
