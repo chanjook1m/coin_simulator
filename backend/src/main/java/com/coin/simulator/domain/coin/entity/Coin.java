@@ -26,7 +26,7 @@ public class Coin {
     private String market;
 
     @Enumerated(EnumType.STRING)
-    private CoinStatus coinStatus;
+    private CoinStatus status;
 
     @Builder
     public Coin(String symbol, String name, String market) {

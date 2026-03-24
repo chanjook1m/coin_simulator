@@ -1,11 +1,12 @@
 package com.coin.simulator.infrastructure.exchange.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public record UpbitMarketResponse (
+public record UpbitMarketResponse(
         String market,
-        String koreanName,
-        String englishName
-){
+        @JsonProperty("korean_name") String koreanName,
+        @JsonProperty("english_name") String englishName
+) {
 }

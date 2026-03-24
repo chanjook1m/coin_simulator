@@ -22,7 +22,7 @@ public class CoinService {
     private final CoinRepository coinRepository;
     private final ExchangeClient exchangeClient;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<CoinResponse> getActiveCoins() {
         List<Coin> coins = coinRepository.findAllByStatus(CoinStatus.ACTIVE);
         if (!coins.isEmpty()) {
