@@ -21,7 +21,7 @@ public class CoinService {
     private final CoinRepository coinRepository;
     private final ExchangeClient exchangeClient;
 
-    @Transactional
+
     public List<CoinResponse> getActiveCoins() {
         List<Coin> coins = coinRepository.findAllByStatus(CoinStatus.ACTIVE);
         if (!coins.isEmpty()) {
@@ -45,8 +45,12 @@ public class CoinService {
                         .build())
                 .toList();
 
-        coinRepository.saveAll(newCoins);
+        return saveAllCoinListAndReturnResponses(newCoins);
+    }
 
-        return newCoins.stream().map(CoinResponse::from).toList();
+    @Transactional
+    public List<CoinResponse> saveAllCoinListAndReturnResponses(List<Coin> newCoins) {
+        List<Coin> savedCoins = coinRepository.saveAll(newCoins);
+        return savedCoins.stream().map(CoinResponse::from).toList();
     }
 }
