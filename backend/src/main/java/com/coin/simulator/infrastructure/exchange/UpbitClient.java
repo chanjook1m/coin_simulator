@@ -18,13 +18,14 @@ import java.util.List;
 @Slf4j
 public class UpbitClient implements ExchangeClient {
     private static final String KRW_PREFIX = "KRW-";
+    private static final String GET_ALL_COIN_LIST = "/v1/market/all?isDetails=true";
     private final RestClient upbitRestClient;
 
     @Override
     public List<ExchangeMarketResponse> getMarkets() {
         try {
             List<UpbitMarketResponse> res = upbitRestClient.get()
-                    .uri("/v1/market/all?isDetails=true")
+                    .uri(GET_ALL_COIN_LIST)
                     .retrieve()
                     .body(new ParameterizedTypeReference<List<UpbitMarketResponse>>() {
                     });
