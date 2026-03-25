@@ -6,7 +6,6 @@ import com.coin.simulator.domain.coin.entity.Coin;
 import com.coin.simulator.domain.coin.entity.CoinStatus;
 import com.coin.simulator.domain.coin.repository.CoinRepository;
 import com.coin.simulator.infrastructure.exchange.ExchangeClient;
-import com.coin.simulator.infrastructure.exchange.ExternalExchangeException;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeMarketResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +29,8 @@ public class CoinService {
         }
 
         List<ExchangeMarketResponse> markets;
-        try {
-            markets = exchangeClient.getMarkets();
-        } catch (ExternalExchangeException e) {
-            log.error("거래소 마켓 조회 실패", e);
-            throw e;
-        }
+
+        markets = exchangeClient.getMarkets();
 
         if (markets.isEmpty()) {
             log.warn("거래소에서 가져온 마켓 목록 비어 있음");
