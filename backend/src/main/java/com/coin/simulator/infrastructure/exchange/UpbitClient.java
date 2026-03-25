@@ -10,7 +10,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -18,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UpbitClient implements ExchangeClient {
+    private static final String KRW_PREFIX = "KRW-";
     private final RestClient upbitRestClient;
 
     @Override
@@ -26,7 +26,8 @@ public class UpbitClient implements ExchangeClient {
             List<UpbitMarketResponse> res = upbitRestClient.get()
                     .uri("/v1/market/all?isDetails=true")
                     .retrieve()
-                    .body(new ParameterizedTypeReference<List<UpbitMarketResponse>>() {});
+                    .body(new ParameterizedTypeReference<List<UpbitMarketResponse>>() {
+                    });
 
             if (res == null) {
                 log.warn("[Upbit] /market/all 응답이 null");
@@ -34,7 +35,7 @@ public class UpbitClient implements ExchangeClient {
             }
 
             return res.stream()
-                    .filter(m -> m.market().startsWith("KRW-"))
+                    .filter(m -> m.market().startsWith(KRW_PREFIX))
                     .map(m -> ExchangeMarketResponse.builder()
                             .market(m.market())
                             .symbol(extractSymbol(m.market()))
@@ -42,7 +43,7 @@ public class UpbitClient implements ExchangeClient {
                             .build())
                     .toList();
 
-        } catch(RestClientException e) {
+        } catch (RestClientException e) {
             log.error("[Upbit] getMarkets 호출 실패", e);
             throw new ExternalExchangeException("거래소 마켓 목록 조회 실패", e);
         }
@@ -62,7 +63,8 @@ public class UpbitClient implements ExchangeClient {
                             .queryParam("markets", marketsParam)
                             .build())
                     .retrieve()
-                    .body(new ParameterizedTypeReference<List<UpbitTickerResponse>>() {});
+                    .body(new ParameterizedTypeReference<List<UpbitTickerResponse>>() {
+                    });
 
             if (res == null || res.isEmpty()) {
                 log.warn("[Upbit] /ticker 응답이 비어 있음", marketsParam);
@@ -85,6 +87,6 @@ public class UpbitClient implements ExchangeClient {
     }
 
     private String extractSymbol(String market) {
-        return market.substring(4); // "KRW-"
+        return market.substring(KRW_PREFIX.length());
     }
 }
