@@ -52,9 +52,6 @@ public class UpbitClient implements ExchangeClient {
 
     @Override
     public List<ExchangeTickerResponse> getTicker(List<String> markets) {
-        if (markets == null || markets.isEmpty())
-            return List.of();
-
         String marketsParam = String.join(",", markets);
 
         try {
