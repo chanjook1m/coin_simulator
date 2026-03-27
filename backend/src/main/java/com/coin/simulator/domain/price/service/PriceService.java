@@ -8,7 +8,6 @@ import com.coin.simulator.domain.price.dto.PriceResponse;
 import com.coin.simulator.domain.price.entity.Price;
 import com.coin.simulator.domain.price.repository.PriceRepository;
 import com.coin.simulator.infrastructure.exchange.ExchangeClient;
-import com.coin.simulator.infrastructure.exchange.ExternalExchangeException;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeTickerResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,18 +46,13 @@ public class PriceService {
         String market = "KRW-" + coin.getSymbol();
 
         List<ExchangeTickerResponse> tickers;
-        try {
-            tickers = exchangeClient.getTicker(List.of(market));
 
-        } catch (ExternalExchangeException e) {
-            log.error("거래소 시세 조회 실패", market, e);
-            throw e;
+        tickers = exchangeClient.getTicker(List.of(market));
+
+        if (tickers == null || tickers.isEmpty()) {
+            log.error("거래소에서 가져온 코인 시세 비어있음");
+            throw new NotFoundException("해당 코인 시세를 찾을 수 없습니다: " + coin.getSymbol());
         }
-
-        if (tickers.isEmpty()) {
-            throw new NotFoundException("지원하지 않는 코인입니다: " + coin.getSymbol());
-        }
-
 
         ExchangeTickerResponse firstTicker = tickers.get(0);
         LocalDateTime ts = LocalDateTime
