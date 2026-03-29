@@ -4,6 +4,7 @@ import com.coin.simulator.infrastructure.exchange.dto.ExchangeMarketResponse;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeTickerResponse;
 import com.coin.simulator.infrastructure.exchange.dto.UpbitMarketResponse;
 import com.coin.simulator.infrastructure.exchange.dto.UpbitTickerResponse;
+import com.coin.simulator.infrastructure.exchange.exception.ExchangeConnectionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -46,7 +47,7 @@ public class UpbitClient implements ExchangeClient {
 
         } catch (RestClientException e) {
             log.error("[Upbit] getMarkets 호출 실패", e);
-            throw new ExternalExchangeException("거래소 마켓 목록 조회 실패", e);
+            throw new ExchangeConnectionException(e);
         }
     }
 
@@ -79,7 +80,7 @@ public class UpbitClient implements ExchangeClient {
 
         } catch (RestClientException e) {
             log.error("[Upbit] getTickers 호출 실패", marketsParam, e);
-            throw new ExternalExchangeException("거래소 시세 조회 실패", e);
+            throw new ExchangeConnectionException(e);
         }
 
     }

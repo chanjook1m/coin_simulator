@@ -1,11 +1,12 @@
 package com.coin.simulator.domain.price.service;
 
-import com.coin.simulator.common.exception.BadRequestException;
-import com.coin.simulator.common.exception.NotFoundException;
 import com.coin.simulator.domain.coin.entity.Coin;
 import com.coin.simulator.domain.coin.repository.CoinRepository;
 import com.coin.simulator.domain.price.dto.PriceResponse;
 import com.coin.simulator.domain.price.entity.Price;
+import com.coin.simulator.domain.price.exception.CoinNotExistException;
+import com.coin.simulator.domain.price.exception.CoinPriceNotExistException;
+import com.coin.simulator.domain.price.exception.EmptySymbolException;
 import com.coin.simulator.domain.price.repository.PriceRepository;
 import com.coin.simulator.infrastructure.exchange.ExchangeClient;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeTickerResponse;
@@ -29,13 +30,13 @@ public class PriceService {
 
     public PriceResponse getLatestPrice(String symbol) {
         if (symbol == null || symbol.isBlank()) {
-            throw new BadRequestException("심볼은 필수 값입니다");
+            throw new EmptySymbolException();
         }
 
         String upperSymbol = symbol.toUpperCase();
 
         Coin coin = coinRepository.findBySymbol(upperSymbol)
-                .orElseThrow(() -> new NotFoundException("존재 하지 않는 코인입니다" + upperSymbol));
+                .orElseThrow(() -> new CoinNotExistException(upperSymbol));
 
         PriceResponse latestPrice = fetchFromExchangeAndSave(coin);
 
@@ -51,7 +52,7 @@ public class PriceService {
 
         if (tickers == null || tickers.isEmpty()) {
             log.error("거래소에서 가져온 코인 시세 비어있음");
-            throw new NotFoundException("해당 코인 시세를 찾을 수 없습니다: " + coin.getSymbol());
+            throw new CoinPriceNotExistException(coin.getSymbol());
         }
 
         ExchangeTickerResponse firstTicker = tickers.get(0);

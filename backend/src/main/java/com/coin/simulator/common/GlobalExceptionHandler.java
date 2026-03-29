@@ -1,13 +1,11 @@
 package com.coin.simulator.common;
 
-import com.coin.simulator.common.exception.BadRequestException;
-import com.coin.simulator.common.exception.NotFoundException;
-import com.coin.simulator.infrastructure.exchange.ExternalExchangeException;
+import com.coin.simulator.common.exception.BusinessException;
+import com.coin.simulator.common.exception.ErrorCode;
+import com.coin.simulator.infrastructure.exchange.exception.ExchangeConnectionException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
@@ -15,34 +13,31 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(HttpStatus.BAD_REQUEST, e.getMessage()));
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusiness(BusinessException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        log.warn("BusinessException: code={}, message={}", errorCode.getCode(), e.getMessage());
+
+        ErrorResponse body = ErrorResponse.of(errorCode, e.getMessage());
+        return ResponseEntity.status(errorCode.getStatus()).body(body);
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ErrorResponse.of(HttpStatus.NOT_FOUND, e.getMessage()));
-    }
+    @ExceptionHandler(ExchangeConnectionException.class)
+    public ResponseEntity<ErrorResponse> handleExternal(ExchangeConnectionException e) {
+        ErrorCode errorCode = ErrorCode.EXTERNAL_EXCHANGE_ERROR;
+        log.error("ExternalExchangeException: {}", e.getMessage(), e);
 
-    @ExceptionHandler(ExternalExchangeException.class)
-    @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    public ResponseEntity<ErrorResponse> handleExternal(ExternalExchangeException e) {
-        log.error("외부 거래소 연동 실패", e);
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(HttpStatus.BAD_GATEWAY, "외부 거래소 연동 중 오류가 발생했습니다"));
+        ErrorResponse body = ErrorResponse.of(errorCode, null);
+        return ResponseEntity.status(errorCode.getStatus()).body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleUnknown(Exception e) {
-        log.error("예상치 못한 서버 오류");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다"));
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        log.error("Unexpected error", e);
+
+        ErrorResponse body = ErrorResponse.of(errorCode, null);
+        return ResponseEntity.status(errorCode.getStatus()).body(body);
     }
 
     public record ErrorResponse(
@@ -51,11 +46,11 @@ public class GlobalExceptionHandler {
             String message,
             String timestamp
     ) {
-        public static ErrorResponse of(HttpStatus status, String message) {
+        public static ErrorResponse of(ErrorCode errorCode, String message) {
             return new ErrorResponse(
-                    status.value(),
-                    status.getReasonPhrase(),
-                    message,
+                    errorCode.getStatus().value(),
+                    errorCode.getCode(),
+                    message != null ? message : errorCode.getMessage(),
                     LocalDateTime.now().toString()
             );
         }

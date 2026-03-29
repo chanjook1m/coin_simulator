@@ -1,9 +1,9 @@
 package com.coin.simulator.domain.coin.service;
 
-import com.coin.simulator.common.exception.NotFoundException;
 import com.coin.simulator.domain.coin.dto.CoinResponse;
 import com.coin.simulator.domain.coin.entity.Coin;
 import com.coin.simulator.domain.coin.entity.CoinStatus;
+import com.coin.simulator.domain.coin.exception.MarketDataEmptyException;
 import com.coin.simulator.domain.coin.repository.CoinRepository;
 import com.coin.simulator.infrastructure.exchange.ExchangeClient;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeMarketResponse;
@@ -34,7 +34,7 @@ public class CoinService {
 
         if (markets.isEmpty()) {
             log.warn("거래소에서 가져온 마켓 목록 비어 있음");
-            throw new NotFoundException("지원 가능한 코인 목록이 없습니다");
+            throw new MarketDataEmptyException();
         }
 
         List<Coin> newCoins = markets.stream()

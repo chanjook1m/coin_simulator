@@ -1,0 +1,36 @@
+package com.coin.simulator.common.exception;
+
+import org.springframework.http.HttpStatus;
+
+public enum ErrorCode {
+    INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "W001", "잔액이 부족합니다"),
+    EXTERNAL_EXCHANGE_ERROR(HttpStatus.BAD_GATEWAY, "E001", "외부 거래소 연동 중 오류가 발생했습니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "서버 내부 오류가 발생했습니다."),
+    EMPTY_SYMBOL(HttpStatus.BAD_REQUEST, "R001", "심볼은 필수 값입니다."),
+    COIN_PRICE_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "코인 시세를 찾을 수 없습니다."),
+    COIN_NOT_FOUND(HttpStatus.NOT_FOUND, "C001", "존재하지 않는 코인입니다"),
+    EXCHANGE_MARKET_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "E001", "거래소에서 지원하는 코인 목록을 찾을 수 없습니다"),
+    EXCHANGE_MARKET_CONNECTION_ERROR(HttpStatus.BAD_GATEWAY, "E002", "거래소 통신 중 오류가 발생했습니다");
+
+    private final HttpStatus status;
+    private final String code;
+    private final String message;
+
+    ErrorCode(HttpStatus status, String code, String message) {
+        this.status = status;
+        this.code = code;
+        this.message = message;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+}
