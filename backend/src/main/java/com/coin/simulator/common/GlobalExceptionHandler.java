@@ -5,10 +5,13 @@ import com.coin.simulator.common.exception.ErrorCode;
 import com.coin.simulator.infrastructure.exchange.exception.ExchangeConnectionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -29,6 +32,15 @@ public class GlobalExceptionHandler {
 
         ErrorResponse body = ErrorResponse.of(errorCode, null);
         return ResponseEntity.status(errorCode.getStatus()).body(body);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleJsonParseException(HttpMessageNotReadableException e) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "INVALID_JSON_FORMAT");
+        response.put("message", "JSON 형식이 올바르지 않습니다. 따옴표나 쉼표를 확인하세요.");
+        
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(Exception.class)
