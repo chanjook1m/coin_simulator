@@ -1,6 +1,8 @@
 package com.coin.simulator.domain.order.entity;
 
 import com.coin.simulator.domain.coin.entity.Coin;
+import com.coin.simulator.domain.order.exception.InvalidLimitPriceException;
+import com.coin.simulator.domain.order.exception.InvalidOrderStatusException;
 import com.coin.simulator.domain.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,5 +79,19 @@ public class Order {
                 .filledQuantity(BigDecimal.ZERO)
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void fillAll(BigDecimal executedPrice) {
+        if (this.status != OrderStatus.PENDING) {
+            throw new InvalidOrderStatusException(this.status);
+        }
+
+        if (executedPrice == null || executedPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidLimitPriceException();
+        }
+
+        this.targetPrice = executedPrice;
+        this.filledQuantity = this.totalQuantity;
+        this.status = OrderStatus.FILLED;
     }
 }

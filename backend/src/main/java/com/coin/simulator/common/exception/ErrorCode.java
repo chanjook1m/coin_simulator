@@ -16,6 +16,9 @@ public enum ErrorCode {
 
     // --- ORDER (O) ---
     INVALID_ORDER_QUANTITY(HttpStatus.BAD_REQUEST, "O001", "주문 수량은 0보다 커야 합니다."),
+    INVALID_LIMIT_PRICE(HttpStatus.BAD_REQUEST, "O002", "지정가는 0보다 커야 합니다."),
+    INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "O003", "해당 작업을 수행할 수 없는 주문 상태입니다."),
+    INVALID_EXECUTION_PRICE(HttpStatus.BAD_REQUEST, "O004", "체결가는 0보다 커야 합니다."),
 
     // --- Coin & Price (C, P) ---
     COIN_NOT_FOUND(HttpStatus.NOT_FOUND, "C001", "존재하지 않는 코인입니다"),

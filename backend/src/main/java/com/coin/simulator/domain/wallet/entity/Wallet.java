@@ -37,7 +37,7 @@ public class Wallet {
     private BigDecimal balance;
 
     public void debit(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidAmountException("차감");
         }
 
@@ -49,7 +49,7 @@ public class Wallet {
     }
 
     public void credit(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidAmountException("충전");
         }
 
