@@ -1,4 +1,4 @@
-package com.coin.simulator.domain.price.exception;
+package com.coin.simulator.domain.coin.exception;
 
 import com.coin.simulator.common.exception.BusinessException;
 import com.coin.simulator.common.exception.ErrorCode;

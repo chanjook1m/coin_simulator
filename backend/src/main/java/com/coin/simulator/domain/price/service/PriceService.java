@@ -1,11 +1,11 @@
 package com.coin.simulator.domain.price.service;
 
 import com.coin.simulator.domain.coin.entity.Coin;
+import com.coin.simulator.domain.coin.exception.CoinNotFoundException;
+import com.coin.simulator.domain.coin.exception.CoinPriceNotExistException;
 import com.coin.simulator.domain.coin.repository.CoinRepository;
 import com.coin.simulator.domain.price.dto.PriceResponse;
 import com.coin.simulator.domain.price.entity.Price;
-import com.coin.simulator.domain.price.exception.CoinNotExistException;
-import com.coin.simulator.domain.price.exception.CoinPriceNotExistException;
 import com.coin.simulator.domain.price.exception.EmptySymbolException;
 import com.coin.simulator.domain.price.repository.PriceRepository;
 import com.coin.simulator.infrastructure.exchange.ExchangeClient;
@@ -36,7 +36,7 @@ public class PriceService {
         String upperSymbol = symbol.toUpperCase();
 
         Coin coin = coinRepository.findBySymbol(upperSymbol)
-                .orElseThrow(() -> new CoinNotExistException(upperSymbol));
+                .orElseThrow(() -> new CoinNotFoundException(upperSymbol));
 
         PriceResponse latestPrice = fetchFromExchangeAndSave(coin);
 
