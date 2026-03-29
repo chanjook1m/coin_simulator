@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -47,13 +48,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException e) {
-       
+
         ErrorCode errorCode = ErrorCode.RESOURCE_NOT_FOUND;
 
         log.warn("잘못된 경로 요청: {}", e.getMessage());
 
         ErrorResponse body = ErrorResponse.of(errorCode, "요청하신 경로를 찾을 수 없습니다: " + e.getResourcePath());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ErrorResponse> handleMissingHeader(MissingRequestHeaderException e) {
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+
+        log.warn("필수 헤더 누락: {} (Header Name: {})", e.getMessage(), e.getHeaderName());
+
+        ErrorResponse body = ErrorResponse.of(errorCode,
+                String.format("필수 헤더 '%s'가 누락되었습니다.", e.getHeaderName()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(Exception.class)
