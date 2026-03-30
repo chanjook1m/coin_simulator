@@ -56,13 +56,13 @@ public class PriceService {
         }
 
         ExchangeTickerResponse firstTicker = tickers.get(0);
-        LocalDateTime ts = LocalDateTime
+        LocalDateTime timestamp = LocalDateTime
                 .ofInstant(Instant.ofEpochMilli(firstTicker.timestampMillis()), SEOUL_ZONE);
 
         Price price = Price.of(
                 coin,
                 firstTicker.price(),
-                ts);
+                timestamp);
 
         priceRepository.save(price);
 
