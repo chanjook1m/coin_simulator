@@ -1,6 +1,7 @@
 package com.coin.simulator.domain.price.service;
 
 import com.coin.simulator.domain.coin.entity.Coin;
+import com.coin.simulator.domain.coin.entity.CoinConstants;
 import com.coin.simulator.domain.coin.exception.CoinNotFoundException;
 import com.coin.simulator.domain.coin.exception.CoinPriceNotExistException;
 import com.coin.simulator.domain.coin.repository.CoinRepository;
@@ -44,7 +45,7 @@ public class PriceService {
     }
 
     private PriceResponse fetchFromExchangeAndSave(Coin coin) {
-        String market = "KRW-" + coin.getSymbol();
+        String market = CoinConstants.KRW_PREFIX + coin.getSymbol();
 
         List<ExchangeTickerResponse> tickers;
 

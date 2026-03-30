@@ -1,5 +1,6 @@
 package com.coin.simulator.infrastructure.exchange;
 
+import com.coin.simulator.domain.coin.entity.CoinConstants;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeMarketResponse;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeTickerResponse;
 import com.coin.simulator.infrastructure.exchange.dto.UpbitMarketResponse;
@@ -18,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UpbitClient implements ExchangeClient {
-    private static final String KRW_PREFIX = "KRW-";
     private static final String GET_ALL_COIN_LIST = "/v1/market/all?isDetails=true";
     private final RestClient upbitRestClient;
 
@@ -37,7 +37,7 @@ public class UpbitClient implements ExchangeClient {
             }
 
             return res.stream()
-                    .filter(m -> m.market().startsWith(KRW_PREFIX))
+                    .filter(m -> m.market().startsWith(CoinConstants.KRW_PREFIX))
                     .map(m -> ExchangeMarketResponse.builder()
                             .market(m.market())
                             .symbol(extractSymbol(m.market()))
@@ -86,6 +86,6 @@ public class UpbitClient implements ExchangeClient {
     }
 
     private String extractSymbol(String market) {
-        return market.substring(KRW_PREFIX.length());
+        return market.substring(CoinConstants.KRW_PREFIX.length());
     }
 }
