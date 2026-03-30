@@ -1,8 +1,11 @@
 package com.coin.simulator.domain.price.repository;
 
+import com.coin.simulator.domain.coin.entity.Coin;
 import com.coin.simulator.domain.price.entity.Price;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PriceRepository extends JpaRepository<Price, Long>{
+import java.util.Optional;
 
+public interface PriceRepository extends JpaRepository<Price, Long> {
+    Optional<Price> findTopByCoinOrderByTimestampDesc(Coin coin);
 }

@@ -33,5 +33,6 @@ public class Coin {
         this.symbol = symbol;
         this.name = name;
         this.market = market;
+        this.status = CoinStatus.ACTIVE;
     }
 }

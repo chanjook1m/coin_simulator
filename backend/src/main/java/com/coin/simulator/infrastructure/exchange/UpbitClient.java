@@ -1,9 +1,11 @@
 package com.coin.simulator.infrastructure.exchange;
 
+import com.coin.simulator.domain.coin.entity.CoinConstants;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeMarketResponse;
 import com.coin.simulator.infrastructure.exchange.dto.ExchangeTickerResponse;
 import com.coin.simulator.infrastructure.exchange.dto.UpbitMarketResponse;
 import com.coin.simulator.infrastructure.exchange.dto.UpbitTickerResponse;
+import com.coin.simulator.infrastructure.exchange.exception.ExchangeConnectionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UpbitClient implements ExchangeClient {
-    private static final String KRW_PREFIX = "KRW-";
     private static final String GET_ALL_COIN_LIST = "/v1/market/all?isDetails=true";
     private final RestClient upbitRestClient;
 
@@ -36,7 +37,7 @@ public class UpbitClient implements ExchangeClient {
             }
 
             return res.stream()
-                    .filter(m -> m.market().startsWith(KRW_PREFIX))
+                    .filter(m -> m.market().startsWith(CoinConstants.KRW_PREFIX))
                     .map(m -> ExchangeMarketResponse.builder()
                             .market(m.market())
                             .symbol(extractSymbol(m.market()))
@@ -46,7 +47,7 @@ public class UpbitClient implements ExchangeClient {
 
         } catch (RestClientException e) {
             log.error("[Upbit] getMarkets 호출 실패", e);
-            throw new ExternalExchangeException("거래소 마켓 목록 조회 실패", e);
+            throw new ExchangeConnectionException(e);
         }
     }
 
@@ -79,12 +80,12 @@ public class UpbitClient implements ExchangeClient {
 
         } catch (RestClientException e) {
             log.error("[Upbit] getTickers 호출 실패", marketsParam, e);
-            throw new ExternalExchangeException("거래소 시세 조회 실패", e);
+            throw new ExchangeConnectionException(e);
         }
 
     }
 
     private String extractSymbol(String market) {
-        return market.substring(KRW_PREFIX.length());
+        return market.substring(CoinConstants.KRW_PREFIX.length());
     }
 }
