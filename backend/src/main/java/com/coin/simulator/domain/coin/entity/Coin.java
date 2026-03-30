@@ -29,10 +29,10 @@ public class Coin {
     private CoinStatus status;
 
     @Builder
-    public Coin(String symbol, String name, String market, CoinStatus status) {
+    public Coin(String symbol, String name, String market) {
         this.symbol = symbol;
         this.name = name;
         this.market = market;
-        this.status = (status != null) ? status : CoinStatus.ACTIVE;
+        this.status = CoinStatus.ACTIVE;
     }
 }

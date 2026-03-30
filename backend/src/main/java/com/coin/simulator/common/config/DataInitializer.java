@@ -1,7 +1,6 @@
 package com.coin.simulator.common.config;
 
 import com.coin.simulator.domain.coin.entity.Coin;
-import com.coin.simulator.domain.coin.entity.CoinStatus;
 import com.coin.simulator.domain.coin.repository.CoinRepository;
 import com.coin.simulator.domain.price.entity.Price;
 import com.coin.simulator.domain.price.repository.PriceRepository;
@@ -48,7 +47,6 @@ public class DataInitializer implements CommandLineRunner {
                 .symbol("BTC")
                 .name("비트코인")
                 .market("KRW-BTC")
-                .status(CoinStatus.ACTIVE)
                 .build();
         coinRepository.save(btc);
 
