@@ -86,7 +86,8 @@ jobs:
 
             # 기존 컨테이너/볼륨 정리 후 최신 이미지 기준 재기동
             docker-compose down -v || true
-            docker-compose up -d --pull=always
+            docker-compose pull
+            docker-compose up -d
 
             docker image prune -f
 
