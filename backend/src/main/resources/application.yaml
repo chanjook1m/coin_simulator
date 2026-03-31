@@ -21,8 +21,11 @@ spring:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT}
 
+  #  임시적으로 always 설정 (나중에 never로 변경)
   sql:
     init:
-      mode: never
+      mode: always
+      data-locations: classpath:init-dev.sql
+      continue-on-error: true
 server:
   port: 8082
