@@ -7,20 +7,19 @@ import com.coin.simulator.domain.order.dto.OrderLimitBuyRequest;
 import com.coin.simulator.domain.order.dto.OrderMarketBuyRequest;
 import com.coin.simulator.domain.order.dto.OrderResponse;
 import com.coin.simulator.domain.order.entity.Order;
-import com.coin.simulator.domain.order.exception.InvalidLimitPriceException;
-import com.coin.simulator.domain.order.exception.InvalidOrderQuantityException;
 import com.coin.simulator.domain.order.repository.OrderRepository;
 import com.coin.simulator.domain.price.dto.PriceResponse;
-import com.coin.simulator.domain.price.exception.EmptySymbolException;
 import com.coin.simulator.domain.price.service.PriceService;
 import com.coin.simulator.domain.user.entity.User;
 import com.coin.simulator.domain.user.exception.UserNotFoundException;
 import com.coin.simulator.domain.user.repository.UserRepository;
 import com.coin.simulator.domain.wallet.service.WalletService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 
@@ -35,14 +34,7 @@ public class OrderService {
     private final CoinRepository coinRepository;
 
     @Transactional
-    public OrderResponse placeMarketBuyOrder(OrderMarketBuyRequest request, Long userId) {
-        if (request.quantity() == null || request.quantity().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidOrderQuantityException();
-        }
-        if (request.symbol() == null || request.symbol().isBlank()) {
-            throw new EmptySymbolException();
-        }
-
+    public OrderResponse placeMarketBuyOrder(@Valid @RequestBody OrderMarketBuyRequest request, Long userId) {
         String symbol = request.symbol().toUpperCase();
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -70,19 +62,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse placeLimitBuyOrder(OrderLimitBuyRequest request, Long userId) {
-        if (request.quantity() == null || request.quantity().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidOrderQuantityException();
-        }
-
-        if (request.limitPrice() == null || request.limitPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidLimitPriceException();
-        }
-
-        if (request.symbol() == null || request.symbol().isBlank()) {
-            throw new EmptySymbolException();
-        }
-
+    public OrderResponse placeLimitBuyOrder(@Valid @RequestBody OrderLimitBuyRequest request, Long userId) {
         String symbol = request.symbol().toUpperCase();
 
         User user = userRepository.findById(userId)
