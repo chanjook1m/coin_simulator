@@ -67,7 +67,7 @@ public class OrderService {
         orderRepository.save(order);
 
         // 잔액 차감
-        walletService.debit(userId, totalAmount);
+        walletService.debit(userId, totalAmount, coin.getSymbol() + "시장가 매수");
 
         // 보유 코인 증가
         holdingService.increaseCoin(wallet, coin, quantity, executedPrice);
@@ -107,7 +107,7 @@ public class OrderService {
             order.fillAll(currentPrice);
 
             BigDecimal executedAmount = currentPrice.multiply(quantity);
-            walletService.debit(userId, executedAmount);
+            walletService.debit(userId, executedAmount, coin.getSymbol() + "지정가 매수");
 
             // 보유 코인 증가
             holdingService.increaseCoin(wallet, coin, quantity, currentPrice);
@@ -145,7 +145,7 @@ public class OrderService {
 
         // 코인 수량 차감 + 현금 잔액 증가
         holdingService.decreaseCoin(wallet, coin, quantity);
-        walletService.credit(userId, totalAmount);
+        walletService.credit(userId, totalAmount, coin.getSymbol() + "시장가 매도");
 
         return OrderResponse.from(order);
     }
@@ -184,7 +184,7 @@ public class OrderService {
             BigDecimal executedAmount = currentPrice.multiply(quantity);
 
             holdingService.decreaseCoin(wallet, coin, quantity);
-            walletService.credit(userId, executedAmount);
+            walletService.credit(userId, executedAmount, coin.getSymbol() + "지정가 매도");
         }
         // else PENDING 상태 유지
 
