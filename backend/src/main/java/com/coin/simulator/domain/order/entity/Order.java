@@ -4,6 +4,7 @@ import com.coin.simulator.domain.coin.entity.Coin;
 import com.coin.simulator.domain.order.exception.InvalidLimitPriceException;
 import com.coin.simulator.domain.order.exception.InvalidOrderStatusException;
 import com.coin.simulator.domain.user.entity.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -49,7 +50,11 @@ public class Order {
     private OrderStatus status;
 
     private BigDecimal targetPrice;
+    
+    @Column(precision = 30, scale = 8)
     private BigDecimal totalQuantity;
+
+    @Column(precision = 30, scale = 8)
     private BigDecimal filledQuantity;
     private LocalDateTime createdAt;
 

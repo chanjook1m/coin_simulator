@@ -140,6 +140,7 @@ public class OrderService {
         holdingService.checkEnoughCoin(wallet, coin, quantity);
 
         // 주문 생성 (즉시 체결)
+        log.info("SELL_REQ qty={}", quantity);
         Order order = Order.marketSell(user, coin, executedPrice, quantity);
         orderRepository.save(order);
 
