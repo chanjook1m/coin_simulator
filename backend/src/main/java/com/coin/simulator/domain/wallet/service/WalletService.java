@@ -34,4 +34,11 @@ public class WalletService {
         wallet.debit(amount);
     }
 
+    @Transactional
+    public void credit(Long userId, BigDecimal amount) {
+        Wallet wallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new WalletNotFoundException(userId));
+
+        wallet.credit(amount);
+    }
 }

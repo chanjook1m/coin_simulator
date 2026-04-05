@@ -81,6 +81,34 @@ public class Order {
                 .build();
     }
 
+    public static Order marketSell(User user, Coin coin, BigDecimal executedPrice, BigDecimal quantity) {
+        return Order.builder()
+                .user(user)
+                .coin(coin)
+                .type(OrderType.MARKET)
+                .method(OrderMethod.SELL)
+                .status(OrderStatus.FILLED)
+                .targetPrice(executedPrice)
+                .totalQuantity(quantity)
+                .filledQuantity(quantity)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static Order limitSellPending(User user, Coin coin, BigDecimal limitPrice, BigDecimal quantity) {
+        return Order.builder()
+                .user(user)
+                .coin(coin)
+                .type(OrderType.LIMIT)
+                .method(OrderMethod.SELL)
+                .status(OrderStatus.PENDING)
+                .targetPrice(limitPrice)
+                .totalQuantity(quantity)
+                .filledQuantity(BigDecimal.ZERO)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
     public void fillAll(BigDecimal executedPrice) {
         if (this.status != OrderStatus.PENDING) {
             throw new InvalidOrderStatusException(this.status);

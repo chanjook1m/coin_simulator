@@ -30,7 +30,11 @@ public enum ErrorCode {
     // --- External Exchange (E) ---
     EXTERNAL_EXCHANGE_ERROR(HttpStatus.BAD_GATEWAY, "E001", "외부 거래소 연동 중 오류가 발생했습니다."),
     EXCHANGE_MARKET_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "E002", "거래소에서 지원하는 코인 목록을 찾을 수 없습니다"),
-    EXCHANGE_MARKET_CONNECTION_ERROR(HttpStatus.BAD_GATEWAY, "E003", "거래소 통신 중 오류가 발생했습니다");
+    EXCHANGE_MARKET_CONNECTION_ERROR(HttpStatus.BAD_GATEWAY, "E003", "거래소 통신 중 오류가 발생했습니다"),
+
+    // --- Holding (H) ---
+    INSUFFICIENT_COIN_QUANTITY(HttpStatus.BAD_REQUEST, "H001", "보유 코인 수량이 부족합니다."),
+    HOLDING_NOT_FOUND(HttpStatus.NOT_FOUND, "H002", "해당 코인 보유 내역이 존재하지 않습니다.");
 
     private final HttpStatus status;
     private final String code;

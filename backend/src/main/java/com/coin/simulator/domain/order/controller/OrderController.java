@@ -1,7 +1,9 @@
 package com.coin.simulator.domain.order.controller;
 
 import com.coin.simulator.domain.order.dto.OrderLimitBuyRequest;
+import com.coin.simulator.domain.order.dto.OrderLimitSellRequest;
 import com.coin.simulator.domain.order.dto.OrderMarketBuyRequest;
+import com.coin.simulator.domain.order.dto.OrderMarketSellRequest;
 import com.coin.simulator.domain.order.dto.OrderResponse;
 import com.coin.simulator.domain.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +33,19 @@ public class OrderController {
     public OrderResponse placeLimitBuy(@RequestBody OrderLimitBuyRequest request,
                                        @RequestHeader("X-USER-ID") Long userId) {
         return orderService.placeLimitBuyOrder(request, userId);
+    }
+
+    @PostMapping("/market/sell")
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrderResponse placeMarketSell(@RequestBody OrderMarketSellRequest request,
+                                         @RequestHeader("X-USER-ID") Long userId) {
+        return orderService.placeMarketSellOrder(request, userId);
+    }
+
+    @PostMapping("/limit/sell")
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrderResponse placeLimitSell(@RequestBody OrderLimitSellRequest request,
+                                        @RequestHeader("X-USER-ID") Long userId) {
+        return orderService.placeLimitSellOrder(request, userId);
     }
 }
