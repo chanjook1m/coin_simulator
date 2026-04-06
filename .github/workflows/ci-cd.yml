@@ -80,9 +80,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "monitoring/prometheus-prod.yml" # 깃허브 경로
-          target: "~/coin-simulator/monitoring"  # EC2 경로
-          strip_components: 1
+          source: "backend/monitoring/prometheus-prod.yml" 
+          target: "~/coin-simulator/monitoring"
+          strip_components: 2 
+          overwrite: true
           
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
