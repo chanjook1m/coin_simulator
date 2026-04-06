@@ -85,6 +85,18 @@ jobs:
           strip_components: 2 
           overwrite: true
           
+      # [수정] 설정 파일과 도커 컴포즈 파일을 모두 EC2로 전송
+      - name: Copy Config and Compose Files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          # 보낼 파일들을 나열합니다.
+          source: "docker-compose.yml,docker-compose.prod.yml,monitoring/prometheus-prod.yml"
+          target: "~/coin-simulator"
+          overwrite: true
+          
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
