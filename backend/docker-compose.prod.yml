@@ -1,0 +1,21 @@
+services:
+  swag:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - URL=${DUCKDNS_DOMAIN}
+      - VALIDATION=dns
+      - DNSPLUGIN=duckdns
+      - DUCKDNSTOKEN=${DUCKDNS_TOKEN}
+      - SUBDOMAINS=wildcard
+    volumes:
+      - ./swag:/config
+    ports:
+      - "80:80"
+      - "443:443"

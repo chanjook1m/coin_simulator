@@ -85,9 +85,9 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
             # 기존 컨테이너/볼륨 정리 후 최신 이미지 기준 재기동
-            docker-compose down -v || true
-            docker-compose pull
-            docker-compose up -d
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml down -v || true
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
             docker image prune -f
 
