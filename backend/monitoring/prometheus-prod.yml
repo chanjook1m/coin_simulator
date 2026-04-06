@@ -5,7 +5,7 @@ scrape_configs:
   - job_name: 'coin-simulator'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'host.docker.internal:8082' ]
+      - targets: [ 'app:8082' ]
         labels:
-          env: 'dev'
-          instance: 'local'
+          env: 'prod'
+          instance: 'ec2'
