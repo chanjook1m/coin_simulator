@@ -73,6 +73,17 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/coin-simulator:latest ./backend
           docker push ${{ secrets.DOCKER_USERNAME }}/coin-simulator:latest
 
+      # [추가] GitHub에 있는 monitoring 폴더를 EC2로 전송
+      - name: Copy Monitoring Config to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "monitoring/prometheus-prod.yml" # 깃허브 경로
+          target: "~/coin-simulator/monitoring"  # EC2 경로
+          strip_components: 1
+          
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
