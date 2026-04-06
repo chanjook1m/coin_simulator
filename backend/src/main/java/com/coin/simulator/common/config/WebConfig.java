@@ -16,7 +16,9 @@ public class WebConfig {
                 registry.addMapping("/api/**")
                         .allowedOrigins(
                                 "http://localhost:5173",
-                                "http://ec2-3-27-221-152.ap-southeast-2.compute.amazonaws.com"
+                                "http://ec2-3-27-221-152.ap-southeast-2.compute.amazonaws.com",
+                                "https://chanjook1m.github.io",
+                                "https://www.coin-simulator.duckdns.org"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
